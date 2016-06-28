@@ -129,6 +129,7 @@ public class StockTaskService extends GcmTaskService{
       } catch (IOException e){
         e.printStackTrace();
       }
+      Log.e("StockTaskService", urlString);
     }
 
     return result;
