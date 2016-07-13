@@ -1,5 +1,6 @@
 package com.sam_chordas.android.stockhawk.service;
 
+import android.content.ContentProviderOperation;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.OperationApplicationException;
@@ -21,6 +22,7 @@ import com.squareup.okhttp.Response;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 
 /**
  * Created by sam_chordas on 9/30/15.
@@ -128,8 +130,18 @@ public class StockTaskService extends GcmTaskService {
                         mContext.getContentResolver().update(QuoteProvider.Quotes.CONTENT_URI, contentValues,
                                 null, null);
                     }
-                    mContext.getContentResolver().applyBatch(QuoteProvider.AUTHORITY,
-                            Utils.quoteJsonToContentVals(getResponse));
+                    // simplifying
+                    ArrayList<ContentProviderOperation> responseArray = Utils.quoteJsonToContentVals(getResponse);
+
+                    if ((responseArray != null) && (responseArray.size() > 0)) {
+//                        mContext.getContentResolver().applyBatch(QuoteProvider.AUTHORITY,
+//                                Utils.quoteJsonToContentVals(getResponse));
+                        mContext.getContentResolver().applyBatch(QuoteProvider.AUTHORITY, responseArray);
+                    }
+                    else {
+                        // to trigger handler and toast in service
+                        result = GcmNetworkManager.RESULT_FAILURE;
+                    }
                 } catch (RemoteException | OperationApplicationException e) {
                     Log.e(LOG_TAG, "Error applying batch insert", e);
                 }

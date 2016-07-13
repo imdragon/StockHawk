@@ -114,7 +114,6 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
                   Cursor c = getContentResolver().query(QuoteProvider.Quotes.CONTENT_URI,
                       new String[] { QuoteColumns.SYMBOL.toUpperCase() }, QuoteColumns.SYMBOL + "= ?",
                       new String[] { input.toString().toUpperCase() }, null);
-                  Toast.makeText(MyStocksActivity.this, "", Toast.LENGTH_SHORT).show();
                   if (c.getCount() != 0) {
                     Toast toast =
                         Toast.makeText(MyStocksActivity.this, "This stock is already saved!",

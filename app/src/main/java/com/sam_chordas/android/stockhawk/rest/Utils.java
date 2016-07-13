@@ -30,7 +30,9 @@ public class Utils {
         if (count == 1){
           jsonObject = jsonObject.getJSONObject("results")
               .getJSONObject("quote");
-          batchOperations.add(buildBatchOperation(jsonObject));
+          // check for null field meaning stock doesn't exist
+          if (jsonObject.getString("Ask") != "null"){
+          batchOperations.add(buildBatchOperation(jsonObject));}
         } else{
           resultsArray = jsonObject.getJSONObject("results").getJSONArray("quote");
 
