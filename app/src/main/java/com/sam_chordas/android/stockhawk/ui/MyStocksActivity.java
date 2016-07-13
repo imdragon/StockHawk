@@ -86,8 +86,13 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
               @Override public void onItemClick(View v, int position) {
                 //TODO:
                 // do something on item click
+                // get symbol from DB
+                Cursor tempCursor = mContext.getContentResolver().query(QuoteProvider.Quotes.CONTENT_URI,
+                        new String[]{"Distinct " + QuoteColumns.SYMBOL}, null,
+                        null, null);
+                tempCursor.moveToPosition(position);
                 Intent pickedStock = new Intent(MyStocksActivity.this, StockDetails.class);
-                pickedStock.putExtra("stockName", recyclerView.toString());
+                pickedStock.putExtra("stockName", tempCursor.getString(tempCursor.getColumnIndex("symbol")));
                 startActivity(pickedStock);
               }
             }));
