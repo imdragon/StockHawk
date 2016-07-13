@@ -1,9 +1,15 @@
 package com.sam_chordas.android.stockhawk.rest;
 
+import android.app.Activity;
 import android.content.ContentProviderOperation;
+import android.content.Context;
 import android.util.Log;
+import android.widget.Toast;
+
 import com.sam_chordas.android.stockhawk.data.QuoteColumns;
 import com.sam_chordas.android.stockhawk.data.QuoteProvider;
+import com.sam_chordas.android.stockhawk.ui.MyStocksActivity;
+
 import java.util.ArrayList;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -18,7 +24,7 @@ public class Utils {
 
   public static boolean showPercent = true;
 
-  public static ArrayList quoteJsonToContentVals(String JSON){
+  public static ArrayList quoteJsonToContentVals(String JSON, Context myThis){
     ArrayList<ContentProviderOperation> batchOperations = new ArrayList<>();
     JSONObject jsonObject = null;
     JSONArray resultsArray = null;
@@ -30,6 +36,7 @@ public class Utils {
         if (count == 1){
           jsonObject = jsonObject.getJSONObject("results")
               .getJSONObject("quote");
+          Log.e("Results", jsonObject.getJSONObject("results").toString());
           batchOperations.add(buildBatchOperation(jsonObject));
         } else{
           resultsArray = jsonObject.getJSONObject("results").getJSONArray("quote");
@@ -37,6 +44,7 @@ public class Utils {
           if (resultsArray != null && resultsArray.length() != 0){
             for (int i = 0; i < resultsArray.length(); i++){
               jsonObject = resultsArray.getJSONObject(i);
+              Log.e("Utils - response", jsonObject.toString());
               batchOperations.add(buildBatchOperation(jsonObject));
             }
           }
@@ -44,12 +52,16 @@ public class Utils {
       }
     } catch (JSONException e){
       Log.e(LOG_TAG, "String to JSON failed: " + e);
+      Toast.makeText(myThis, "This stock does not exist!", Toast.LENGTH_SHORT).show();
+      batchOperations.clear();
     }
     return batchOperations;
   }
 
   public static String truncateBidPrice(String bidPrice){
-    bidPrice = String.format("%.2f", Float.parseFloat(bidPrice));
+    if (bidPrice != null) {
+      bidPrice = String.format("%.2f", Float.parseFloat(bidPrice));
+    }
     return bidPrice;
   }
 
@@ -75,6 +87,7 @@ public class Utils {
         QuoteProvider.Quotes.CONTENT_URI);
     try {
       String change = jsonObject.getString("Change");
+      Log.e("Utils - Change", change);
       builder.withValue(QuoteColumns.SYMBOL, jsonObject.getString("symbol"));
       builder.withValue(QuoteColumns.BIDPRICE, truncateBidPrice(jsonObject.getString("Bid")));
       builder.withValue(QuoteColumns.PERCENT_CHANGE, truncateChange(
@@ -92,4 +105,5 @@ public class Utils {
     }
     return builder.build();
   }
+
 }
