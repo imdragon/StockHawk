@@ -1,0 +1,16 @@
+<resources>
+    <string name="app_name">Stock Hawk</string>
+
+    <string name="action_example">Example action</string>
+
+    <string name="action_settings">Ajustes</string>
+    <string name="action_change_units">Change Units</string>
+    <string name="symbol_search">Busqueda de símbolo de la acción</string>
+    <string name="content_test">Search for a Stock Symbol</string>
+    <string name="input_hint">FB</string>
+    <string name="input_prefill"></string>
+    <string name="offline_message">Usted está fuera de línea</string>
+    <string name="network_toast">Uh-oh! Esta aplicación requiere una conexión a Internet</string>
+
+    <string name="fab_buttonDesc">Añadir un símbolo</string>
+</resources>

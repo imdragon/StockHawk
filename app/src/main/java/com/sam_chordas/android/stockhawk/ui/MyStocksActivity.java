@@ -19,6 +19,7 @@ import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.sam_chordas.android.stockhawk.R;
@@ -70,9 +71,15 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
     if (savedInstanceState == null){
       // Run the initialize task service so that some stocks appear upon an empty database
       mServiceIntent.putExtra("tag", "init");
+      TextView offlineMessage = (TextView) findViewById(R.id.offline_message);
+
       if (isConnected){
+        if(offlineMessage.getVisibility() == View.VISIBLE){
+          offlineMessage.setVisibility(View.INVISIBLE);
+        }
         startService(mServiceIntent);
       } else{
+        offlineMessage.setVisibility(View.VISIBLE);
         networkToast();
       }
     }
