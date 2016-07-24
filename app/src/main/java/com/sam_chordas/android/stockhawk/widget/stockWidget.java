@@ -1,11 +1,14 @@
 package com.sam_chordas.android.stockhawk.widget;
 
+import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
 import android.content.Context;
+import android.content.Intent;
 import android.widget.RemoteViews;
 
 import com.sam_chordas.android.stockhawk.R;
+import com.sam_chordas.android.stockhawk.ui.MyStocksActivity;
 
 
 /**
@@ -22,6 +25,13 @@ public class stockWidget extends AppWidgetProvider {
         views.setTextViewText(R.id.appwidget_text, widgetText);
 
         // Instruct the widget manager to update the widget
+        appWidgetManager.updateAppWidget(appWidgetId, views);
+
+        // Set up on tap widget
+        Intent mIntent = new Intent(context, MyStocksActivity.class);
+        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, mIntent, 0);
+        views.setOnClickPendingIntent(R.id.widget, pendingIntent);
+
         appWidgetManager.updateAppWidget(appWidgetId, views);
     }
 
