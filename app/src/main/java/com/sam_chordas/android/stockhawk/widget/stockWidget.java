@@ -5,9 +5,12 @@ import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.widget.RemoteViews;
 
 import com.sam_chordas.android.stockhawk.R;
+import com.sam_chordas.android.stockhawk.data.QuoteColumns;
+import com.sam_chordas.android.stockhawk.data.QuoteProvider;
 import com.sam_chordas.android.stockhawk.ui.MyStocksActivity;
 
 
@@ -18,11 +21,28 @@ public class stockWidget extends AppWidgetProvider {
 
     static void updateAppWidget(Context context, AppWidgetManager appWidgetManager,
                                 int appWidgetId) {
+        // Attempt to access data
 
-        CharSequence widgetText = context.getString(R.string.appwidget_text);
+        Cursor tempCursor = context.getContentResolver().query(QuoteProvider.Quotes.CONTENT_URI,
+                new String[]{"Distinct " + QuoteColumns.SYMBOL}, null,
+                null, null);
+        tempCursor.moveToFirst();
+        StringBuilder sb = new StringBuilder();
+        if (tempCursor != null) {
+            sb.append(tempCursor.getString(tempCursor.getColumnIndex("symbol")));
+            while(tempCursor.moveToNext()) {
+                sb.append("\n");
+                sb.append(tempCursor.getString(tempCursor.getColumnIndex("symbol")));
+            }
+        }
+        tempCursor.close();
+
+//        CharSequence widgetText = context.getString(R.string.appwidget_text);
         // Construct the RemoteViews object
         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.stock_widget);
-        views.setTextViewText(R.id.appwidget_text, widgetText);
+        views.setTextViewText(R.id.appwidget_text, sb.toString());
+
+
 
         // Instruct the widget manager to update the widget
         appWidgetManager.updateAppWidget(appWidgetId, views);
