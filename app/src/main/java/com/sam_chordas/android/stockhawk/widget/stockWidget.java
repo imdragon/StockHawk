@@ -42,7 +42,7 @@ public class stockWidget extends AppWidgetProvider {
             {
                 sb.append(tempCursor.getString(tempCursor.getColumnIndex("symbol")));
                 sb.append(" ");
-                sb.append(tempCursor.getString(tempCursor.getColumnIndex("bid_price")));
+                sb.append("$"+tempCursor.getString(tempCursor.getColumnIndex("bid_price")));
                 tempCursor.moveToNext();
                 sb.append("\n");
             }
