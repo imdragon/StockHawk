@@ -6,10 +6,12 @@ import android.appwidget.AppWidgetProvider;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.util.Log;
 import android.widget.RemoteViews;
 
 import com.sam_chordas.android.stockhawk.R;
 import com.sam_chordas.android.stockhawk.data.QuoteColumns;
+import com.sam_chordas.android.stockhawk.data.QuoteDatabase;
 import com.sam_chordas.android.stockhawk.data.QuoteProvider;
 import com.sam_chordas.android.stockhawk.ui.MyStocksActivity;
 
@@ -19,29 +21,39 @@ import com.sam_chordas.android.stockhawk.ui.MyStocksActivity;
  */
 public class stockWidget extends AppWidgetProvider {
 
+    private static String TAG = "stockWidget";
+
     static void updateAppWidget(Context context, AppWidgetManager appWidgetManager,
                                 int appWidgetId) {
-        // Attempt to access data
+        // Access stock data
 
         Cursor tempCursor = context.getContentResolver().query(QuoteProvider.Quotes.CONTENT_URI,
-                new String[]{"Distinct " + QuoteColumns.SYMBOL}, null,
+                new String[]{QuoteColumns.SYMBOL, QuoteColumns.BIDPRICE, QuoteColumns.ISCURRENT}, QuoteColumns.ISCURRENT,
                 null, null);
+
+        // Populate widget
         tempCursor.moveToFirst();
+        Log.d(TAG, String.valueOf(tempCursor.getCount()));
+        Log.d(TAG, tempCursor.getColumnNames().toString());
         StringBuilder sb = new StringBuilder();
-        if (tempCursor != null) {
-            sb.append(tempCursor.getString(tempCursor.getColumnIndex("symbol")));
-            while(tempCursor.moveToNext()) {
-                sb.append("\n");
+        for (int i = 0; i < tempCursor.getCount(); i++) {
+            if (tempCursor.getString(tempCursor.getColumnIndex("is_current")).equalsIgnoreCase("0"))
+                ;
+            {
                 sb.append(tempCursor.getString(tempCursor.getColumnIndex("symbol")));
+                sb.append(" ");
+                sb.append(tempCursor.getString(tempCursor.getColumnIndex("bid_price")));
+                tempCursor.moveToNext();
+                sb.append("\n");
             }
         }
+        Log.d(TAG, sb.toString());
         tempCursor.close();
 
 //        CharSequence widgetText = context.getString(R.string.appwidget_text);
         // Construct the RemoteViews object
         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.stock_widget);
         views.setTextViewText(R.id.appwidget_text, sb.toString());
-
 
 
         // Instruct the widget manager to update the widget

@@ -101,6 +101,7 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
                 Intent pickedStock = new Intent(MyStocksActivity.this, StockDetails.class);
                 pickedStock.putExtra("stockName", tempCursor.getString(tempCursor.getColumnIndex("symbol")));
                 startActivity(pickedStock);
+                tempCursor.close();
               }
             }));
     recyclerView.setAdapter(mCursorAdapter);
