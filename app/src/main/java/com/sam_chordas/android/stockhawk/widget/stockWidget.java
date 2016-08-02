@@ -44,7 +44,8 @@ public class stockWidget extends AppWidgetProvider {
                 sb.append(" ");
                 sb.append("$"+tempCursor.getString(tempCursor.getColumnIndex("bid_price")));
                 tempCursor.moveToNext();
-                sb.append("\n");
+                if(i<tempCursor.getCount()-1){
+                sb.append("\n");}
             }
         }
         Log.d(TAG, sb.toString());
