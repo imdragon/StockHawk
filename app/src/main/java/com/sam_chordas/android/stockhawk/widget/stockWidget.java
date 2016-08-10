@@ -15,6 +15,12 @@ import com.sam_chordas.android.stockhawk.data.QuoteDatabase;
 import com.sam_chordas.android.stockhawk.data.QuoteProvider;
 import com.sam_chordas.android.stockhawk.ui.MyStocksActivity;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.TimeZone;
+
 
 /**
  * Implementation of App Widget functionality.
@@ -23,6 +29,7 @@ public class stockWidget extends AppWidgetProvider {
 
     private static String TAG = "stockWidget";
 
+    // TODO: 8/9/2016 see if moving to update will fix widget update
     static void updateAppWidget(Context context, AppWidgetManager appWidgetManager,
                                 int appWidgetId) {
         // Access stock data
@@ -36,16 +43,32 @@ public class stockWidget extends AppWidgetProvider {
         Log.d(TAG, String.valueOf(tempCursor.getCount()));
         Log.d(TAG, tempCursor.getColumnNames().toString());
         StringBuilder sb = new StringBuilder();
+        // date section
+
+
+        Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("GMT+1:00"));
+        Date currentLocalTime = cal.getTime();
+        DateFormat date = new SimpleDateFormat("KK:mm:ss a");
+// you can get seconds by adding  "...:ss" to it
+        date.setTimeZone(TimeZone.getTimeZone("GMT-8:00"));
+
+        String localTime = date.format(currentLocalTime);
+
+sb.append(localTime);
+        sb.append("\n");
+
+        //
         for (int i = 0; i < tempCursor.getCount(); i++) {
             if (tempCursor.getString(tempCursor.getColumnIndex("is_current")).equalsIgnoreCase("0"))
                 ;
             {
                 sb.append(tempCursor.getString(tempCursor.getColumnIndex("symbol")));
                 sb.append(" ");
-                sb.append("$"+tempCursor.getString(tempCursor.getColumnIndex("bid_price")));
+                sb.append("$" + tempCursor.getString(tempCursor.getColumnIndex("bid_price")));
                 tempCursor.moveToNext();
-                if(i<tempCursor.getCount()-1){
-                sb.append("\n");}
+                if (i < tempCursor.getCount() - 1) {
+                    sb.append("\n");
+                }
             }
         }
         Log.d(TAG, sb.toString());

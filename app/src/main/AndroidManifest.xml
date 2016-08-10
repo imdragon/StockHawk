@@ -55,7 +55,8 @@
             <meta-data
                 android:name="android.appwidget.provider"
                 android:resource="@xml/stock_widget_info" />
-            <meta-data android:name="LauncherMetadata.Requirements.Scrollable"
+            <meta-data
+                android:name="LauncherMetadata.Requirements.Scrollable"
                 android:value="true" />
         </receiver>
     </application>
