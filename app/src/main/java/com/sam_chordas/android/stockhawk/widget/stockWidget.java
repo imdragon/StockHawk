@@ -46,17 +46,15 @@ public class stockWidget extends AppWidgetProvider {
         // date section
 
 
-        Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("GMT+1:00"));
+        Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("GMT-7:00"));
         Date currentLocalTime = cal.getTime();
-        DateFormat date = new SimpleDateFormat("KK:mm:ss a");
+        DateFormat date = new SimpleDateFormat("K:mm:ss a");
 // you can get seconds by adding  "...:ss" to it
-        date.setTimeZone(TimeZone.getTimeZone("GMT-8:00"));
+        date.setTimeZone(TimeZone.getTimeZone("GMT-7:00"));
 
         String localTime = date.format(currentLocalTime);
 
-sb.append(localTime);
-        sb.append("\n");
-
+        sb.append(localTime+"\n");
         //
         for (int i = 0; i < tempCursor.getCount(); i++) {
             if (tempCursor.getString(tempCursor.getColumnIndex("is_current")).equalsIgnoreCase("0"))
