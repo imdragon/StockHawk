@@ -1,10 +1,18 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/widget"
+    android:orientation="vertical"
     android:padding="@dimen/widget_margin">
 
     <!-- android:background="#09C" -->
+    <Button
+        android:id="@+id/widgetPrevious"
+        android:text="Previous"
+        android:onClick="widgetPreviousButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
     <TextView
         android:id="@+id/appwidget_text"
         android:layout_width="wrap_content"
@@ -18,6 +26,14 @@
         android:textSize="24sp"
         android:textStyle="bold|italic" />
 
+    <Button
+        android:id="@+id/widgetNext"
+        android:text="Next"
+        android:onClick="widgetNextButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        />
+
         <!--
         android:background="#690099cc" -->
-</RelativeLayout>
+</LinearLayout>
