@@ -1,18 +1,24 @@
 package com.sam_chordas.android.stockhawk.ui;
 
 import android.app.Activity;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
+import com.db.chart.Tools;
+import com.db.chart.model.LineSet;
+import com.db.chart.view.AxisController;
+import com.db.chart.view.LineChartView;
+import com.db.chart.view.animation.Animation;
+import com.db.chart.view.animation.easing.BounceEase;
 import com.sam_chordas.android.stockhawk.R;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.w3c.dom.Text;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -23,8 +29,11 @@ import java.net.URL;
 
 public class StockDetails extends Activity {
 
+    private LineChartView myLineChart;
     public TextView stockLabel;
     public String currentStockSymbol;
+
+    public LineSet stockPrices;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,6 +42,8 @@ public class StockDetails extends Activity {
         currentStockSymbol = getIntent().getStringExtra("stockName");
         stockLabel = (TextView) findViewById(R.id.stockNameLabel);
         stockLabel.setText(currentStockSymbol);
+        myLineChart = (LineChartView) findViewById(R.id.stockLinechart);
+
 
     }
 
@@ -52,6 +63,12 @@ public class StockDetails extends Activity {
         public StringBuilder quoteString = new StringBuilder();
         private JSONObject results;
         private JSONArray quotes;
+        private String[] graphLabels;
+        private float[] graphValues;
+
+        final String QUERY = "query";
+        final String RESULTS = "results";
+        final String QUOTES = "quote";
 
         /**
          * Override this method to perform a computation on a background thread. The
@@ -74,7 +91,7 @@ public class StockDetails extends Activity {
             try {
 //                https://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20yahoo.finance.historicaldata%20where%20symbol%20%3D%20%22tsla%22%20and%20startDate%20%3D%20%222009-09-11%22%20and%20endDate%20%3D%20%222010-03-10%22&format=json&diagnostics=true&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys&callback=
 
-                url = new URL("https://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20yahoo.finance.historicaldata%20where%20symbol%20%3D%20%22" + stockSymbol[0] + "%22%20and%20startDate%20%3D%20%222016-01-01%22%20and%20endDate%20%3D%20%222016-02-01%22&format=json&diagnostics=true&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys&callback=");
+                url = new URL("https://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20yahoo.finance.historicaldata%20where%20symbol%20%3D%20%22" + stockSymbol[0] + "%22%20and%20startDate%20%3D%20%222016-02-01%22%20and%20endDate%20%3D%20%222016-03-01%22&format=json&diagnostics=true&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys&callback=");
             } catch (MalformedURLException e) {
                 e.printStackTrace();
             }
@@ -106,17 +123,26 @@ public class StockDetails extends Activity {
             try {
                 results = new JSONObject(total.toString());
 
-                results = results.getJSONObject("query");
-                results = results.getJSONObject("results");
-                quotes = results.getJSONArray("quote");
+                results = results.getJSONObject(QUERY);
+                results = results.getJSONObject(RESULTS);
+                quotes = results.getJSONArray(QUOTES);
                 Log.e("results are", quotes.toString());
 //                quotes = results.getJSONArray("quote");
-                quoteString.append("Something else but this");
-                for (int i = 0; i < quotes.length(); i++) {
-                    Log.e("StockDetails Async", "Loop ran: "+i+" times");
+                graphLabels = new String[quotes.length()];
+                graphValues = new float[quotes.length()];
+                for (int i = quotes.length() - 1; i >= 0; i--) {
+                    Log.e("StockDetails Async", "Loop ran: " + i + " times");
                     quoteString.append("\n ***** \n");
                     JSONObject newQuote = quotes.getJSONObject(i);
+                    quoteString.append("On: ");
                     quoteString.append(newQuote.getString("Date"));
+                    graphLabels[i] = newQuote.getString("Date");
+                    quoteString.append(" closed at: $");
+                    int trim = newQuote.getString("Close").indexOf(".");
+                    quoteString.append(newQuote.getString("Close").substring(0, trim + 3));
+                    graphValues[i] = Float.valueOf(newQuote.getString("Close").substring(0, trim + 3));
+
+
                 }
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -141,9 +167,54 @@ public class StockDetails extends Activity {
          */
         @Override
         protected void onPostExecute(Void aVoid) {
-
+            int[] minMax;
 //            stockLabel.setText(total.toString());
             stockLabel.setText(quoteString.toString());
+            stockPrices = new LineSet(graphLabels, graphValues);
+//            stockPrices = new LineSet(new String[] {"first","second","third"}, new float[]{23.4f, 22.3f, 33.32f});
+            minMax = getMinMax(graphValues);
+
+            //Data setup
+            stockPrices.setColor(Color.parseColor("#758cbb"))
+                    .setFill(Color.parseColor("#2d374c"))
+                    .setDotsColor(Color.parseColor("#758cbb"))
+                    .setThickness(2)
+                    .setDashed(new float[]{10f, 10f})
+            ;
+
+            myLineChart.addData(stockPrices);
+
+
+            // Chart setup
+            myLineChart.setBorderSpacing(Tools.fromDpToPx(20))
+                    .setAxisBorderValues(0, 20)
+                    .setYLabels(AxisController.LabelPosition.NONE)
+                    .setLabelsColor(Color.parseColor("#6a84c3"))
+                    .setXAxis(true)
+                    .setYAxis(true)
+                    .setAxisBorderValues(minMax[0]-10, minMax[1]+10, 1);
+
+
+            Animation anim = new Animation()
+                    .setEasing(new BounceEase());
+
+            myLineChart.show(anim);
+        }
+
+        public int[] getMinMax(float[] sortMe) {
+            float max = 0;
+            float min = 0;
+            for (int j = 0; j < sortMe.length; j++) {
+                if (sortMe[j] > max) {
+                    max = sortMe[j];
+                }
+                if (sortMe[j] < min) {
+                    max = sortMe[j];
+                }
+            }
+
+            int[] values = {Math.round(min), Math.round(max)};
+            return values;
         }
     }
 }

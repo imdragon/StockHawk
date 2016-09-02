@@ -8,11 +8,11 @@
     android:orientation="vertical">
 
 
-    <!--<com.db.chart.view.LineChartView xmlns:chart="http://schemas.android.com/apk/res-auto"-->
-        <!--android:id="@+id/stockLinechart"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="100dp" />-->
 
+    <com.db.chart.view.LineChartView xmlns:chart="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/stockLinechart"
+        android:layout_width="match_parent"
+        android:layout_height="500dp" />
     <TextView
         android:id="@+id/stockNameLabel"
         android:layout_width="match_parent"
