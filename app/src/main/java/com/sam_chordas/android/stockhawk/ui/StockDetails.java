@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.db.chart.Tools;
 import com.db.chart.model.LineSet;
@@ -174,6 +175,7 @@ public class StockDetails extends Activity {
 //            stockPrices = new LineSet(new String[] {"first","second","third"}, new float[]{23.4f, 22.3f, 33.32f});
             minMax = getMinMax(graphValues);
 
+stockLabel.append("\n"+minMax[0] + " " + minMax[1]);
             //Data setup
             stockPrices.setColor(Color.parseColor("#758cbb"))
                     .setFill(Color.parseColor("#2d374c"))
@@ -188,11 +190,11 @@ public class StockDetails extends Activity {
             // Chart setup
             myLineChart.setBorderSpacing(Tools.fromDpToPx(20))
                     .setAxisBorderValues(0, 20)
-                    .setYLabels(AxisController.LabelPosition.NONE)
+                    .setYLabels(AxisController.LabelPosition.OUTSIDE)
                     .setLabelsColor(Color.parseColor("#6a84c3"))
                     .setXAxis(true)
                     .setYAxis(true)
-                    .setAxisBorderValues(minMax[0]-10, minMax[1]+10, 1);
+                    .setAxisBorderValues(minMax[0]-10, minMax[1]+10);
 
 
             Animation anim = new Animation()
@@ -207,9 +209,11 @@ public class StockDetails extends Activity {
             for (int j = 0; j < sortMe.length; j++) {
                 if (sortMe[j] > max) {
                     max = sortMe[j];
-                }
+                }}
+                min = max;
+            for (int j = 0; j < sortMe.length; j++) {
                 if (sortMe[j] < min) {
-                    max = sortMe[j];
+                    min = sortMe[j];
                 }
             }
 
