@@ -35,12 +35,13 @@ import java.util.Locale;
 public class StockDetails extends Activity {
 
     private LineChartView myLineChart;
-    public TextView stockLabel;
+    public TextView stockLabel, startDateLabel, endDateLabel;
     public String currentStockSymbol;
 
     public LineSet stockPrices;
-    public int[] startDate = new int[3];
-    public int[] endDate = new int[3];
+    public String[] startDate = new String[3];
+    public String[] endDate = new String[3];
+    public int startEnd = 0;
 
     Calendar myCalendar = Calendar.getInstance();
 
@@ -51,11 +52,29 @@ public class StockDetails extends Activity {
         public void onDateSet(DatePicker view, int year, int monthOfYear,
                               int dayOfMonth) {
             // TODO Auto-generated method stub
+            Log.e("StockDetails", String.valueOf(monthOfYear) + " " + String.valueOf(dayOfMonth) + " " + String.valueOf(year));
             myCalendar.set(Calendar.YEAR, year);
-            Log.e("StockDetails", String.valueOf(monthOfYear)+" "+String.valueOf(dayOfMonth)+" "+String.valueOf(year));
             myCalendar.set(Calendar.MONTH, monthOfYear);
             myCalendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
-            showDate();
+
+            String myFormat = "MM/dd/yy"; //In which you need put here
+            SimpleDateFormat sdf = new SimpleDateFormat(myFormat, Locale.US);
+            String stringDate = sdf.format(myCalendar.getTime());
+            if (startEnd == 0) {
+                startDate[0] = stringDate.substring(0, 2);
+                startDate[1] = stringDate.substring(3, 5);
+                startDate[2] = Integer.toString(year);
+                startDateLabel.setText(stringDate);
+                Log.e("date", startDate[0] + " " + startDate[1] + " " + startDate[2]);
+            }
+            if (startEnd == 1) {
+                endDate[0] = stringDate.substring(0, 2);
+                endDate[1] = stringDate.substring(3, 5);
+                endDate[2] = Integer.toString(year);
+                endDateLabel.setText(stringDate);
+            }
+          
+//            showDate();
         }
 
     };
@@ -65,24 +84,31 @@ public class StockDetails extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_stock_details);
         currentStockSymbol = getIntent().getStringExtra("stockName");
+        startDateLabel = (TextView) findViewById(R.id.startDateLabel);
+        endDateLabel = (TextView) findViewById(R.id.endDateLabel);
+
         stockLabel = (TextView) findViewById(R.id.stockNameLabel);
-           stockLabel.setText(currentStockSymbol);
+        stockLabel.setText(currentStockSymbol);
         myLineChart = (LineChartView) findViewById(R.id.stockLinechart);
 
 
     }
 
-    public void getSomething(View v) {
+    public void getHistoricalData(View v) {
         new GetHistoricalData().execute(currentStockSymbol, null, null);
     }
 
-    public void datePicker(View v) {
+    public void startDatePicker(View v) {
+        startEnd = 0;
 
         new DatePickerDialog(this, date, myCalendar.get(Calendar.YEAR),
                 myCalendar.get(Calendar.MONTH), myCalendar.get(Calendar.DAY_OF_MONTH)).show();
 
 
-    } public void endDatePicker(View v) {
+    }
+
+    public void endDatePicker(View v) {
+        startEnd = 1;
 
 
         new DatePickerDialog(this, date, myCalendar.get(Calendar.YEAR),
@@ -94,7 +120,7 @@ public class StockDetails extends Activity {
 
         String myFormat = "MM/dd/yy"; //In which you need put here
         SimpleDateFormat sdf = new SimpleDateFormat(myFormat, Locale.US);
-        stockLabel.append(sdf.format(myCalendar.getTime()));
+
     }
 
 
@@ -137,10 +163,14 @@ public class StockDetails extends Activity {
             try {
 //                https://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20yahoo.finance.historicaldata%20where%20symbol%20%3D%20%22tsla%22%20and%20startDate%20%3D%20%222009-09-11%22%20and%20endDate%20%3D%20%222010-03-10%22&format=json&diagnostics=true&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys&callback=
 
-                url = new URL("https://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20yahoo.finance.historicaldata%20where%20symbol%20%3D%20%22" + stockSymbol[0] + "%22%20and%20startDate%20%3D%20%222016-02-01%22%20and%20endDate%20%3D%20%222016-03-01%22&format=json&diagnostics=true&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys&callback=");
+                url = new URL("https://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20yahoo.finance.historicaldata" +
+                        "%20where%20symbol%20%3D%20%22" + stockSymbol[0]
+                        + "%22%20and%20startDate%20%3D%20%22" + startDate[2] + "-" + startDate[0] + "-" + startDate[1] + "%22%20and%20" +
+                        "endDate%20%3D%20%22" + endDate[2] + "-" + endDate[0] + "-" + endDate[1] + "%22&format=json&diagnostics=true&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys&callback=");
             } catch (MalformedURLException e) {
                 e.printStackTrace();
             }
+            Log.e("StockDetails", url.toString());
             HttpURLConnection connection = null;
             try {
                 connection = (HttpURLConnection) url.openConnection();
