@@ -1,13 +1,14 @@
 package com.sam_chordas.android.stockhawk.ui;
 
 import android.app.Activity;
+import android.app.DatePickerDialog;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.DatePicker;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.db.chart.Tools;
 import com.db.chart.model.LineSet;
@@ -27,6 +28,9 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Locale;
 
 public class StockDetails extends Activity {
 
@@ -35,6 +39,26 @@ public class StockDetails extends Activity {
     public String currentStockSymbol;
 
     public LineSet stockPrices;
+    public int[] startDate = new int[3];
+    public int[] endDate = new int[3];
+
+    Calendar myCalendar = Calendar.getInstance();
+
+
+    DatePickerDialog.OnDateSetListener date = new DatePickerDialog.OnDateSetListener() {
+
+        @Override
+        public void onDateSet(DatePicker view, int year, int monthOfYear,
+                              int dayOfMonth) {
+            // TODO Auto-generated method stub
+            myCalendar.set(Calendar.YEAR, year);
+            Log.e("StockDetails", String.valueOf(monthOfYear)+" "+String.valueOf(dayOfMonth)+" "+String.valueOf(year));
+            myCalendar.set(Calendar.MONTH, monthOfYear);
+            myCalendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+            showDate();
+        }
+
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,7 +66,7 @@ public class StockDetails extends Activity {
         setContentView(R.layout.activity_stock_details);
         currentStockSymbol = getIntent().getStringExtra("stockName");
         stockLabel = (TextView) findViewById(R.id.stockNameLabel);
-        stockLabel.setText(currentStockSymbol);
+           stockLabel.setText(currentStockSymbol);
         myLineChart = (LineChartView) findViewById(R.id.stockLinechart);
 
 
@@ -50,6 +74,27 @@ public class StockDetails extends Activity {
 
     public void getSomething(View v) {
         new GetHistoricalData().execute(currentStockSymbol, null, null);
+    }
+
+    public void datePicker(View v) {
+
+        new DatePickerDialog(this, date, myCalendar.get(Calendar.YEAR),
+                myCalendar.get(Calendar.MONTH), myCalendar.get(Calendar.DAY_OF_MONTH)).show();
+
+
+    } public void endDatePicker(View v) {
+
+
+        new DatePickerDialog(this, date, myCalendar.get(Calendar.YEAR),
+                myCalendar.get(Calendar.MONTH), myCalendar.get(Calendar.DAY_OF_MONTH)).show();
+
+    }
+
+    private void showDate() {
+
+        String myFormat = "MM/dd/yy"; //In which you need put here
+        SimpleDateFormat sdf = new SimpleDateFormat(myFormat, Locale.US);
+        stockLabel.append(sdf.format(myCalendar.getTime()));
     }
 
 
@@ -175,7 +220,7 @@ public class StockDetails extends Activity {
 //            stockPrices = new LineSet(new String[] {"first","second","third"}, new float[]{23.4f, 22.3f, 33.32f});
             minMax = getMinMax(graphValues);
 
-stockLabel.append("\n"+minMax[0] + " " + minMax[1]);
+            stockLabel.append("\n" + minMax[0] + " " + minMax[1]);
             //Data setup
             stockPrices.setColor(Color.parseColor("#758cbb"))
                     .setFill(Color.parseColor("#2d374c"))
@@ -194,7 +239,7 @@ stockLabel.append("\n"+minMax[0] + " " + minMax[1]);
                     .setLabelsColor(Color.parseColor("#6a84c3"))
                     .setXAxis(true)
                     .setYAxis(true)
-                    .setAxisBorderValues(minMax[0]-10, minMax[1]+10);
+                    .setAxisBorderValues(minMax[0] - 10, minMax[1] + 10);
 
 
             Animation anim = new Animation()
@@ -209,8 +254,9 @@ stockLabel.append("\n"+minMax[0] + " " + minMax[1]);
             for (int j = 0; j < sortMe.length; j++) {
                 if (sortMe[j] > max) {
                     max = sortMe[j];
-                }}
-                min = max;
+                }
+            }
+            min = max;
             for (int j = 0; j < sortMe.length; j++) {
                 if (sortMe[j] < min) {
                     min = sortMe[j];

@@ -26,12 +26,29 @@
         android:layout_height="wrap_content"
         android:onClick="getSomething"
         android:text="1 Month" />
+    <LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+        android:orientation="horizontal">
 
-    <Button
-        android:id="@+id/threeMonthButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="3 Month" />
+        <Button
+            android:layout_weight="1"
+            android:id="@+id/startDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="datePicker"
+            android:text="Choose start date" />
+
+        <Button
+            android:layout_weight="1"
+            android:id="@+id/endDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="endDatePicker"
+            android:text="Choose end date" />
+
+    </LinearLayout>
+
 
 </LinearLayout>
 </ScrollView>
